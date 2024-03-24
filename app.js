@@ -180,9 +180,12 @@ app.put(
   }
 );
 
-app.get("/states/:stateId/stats/", async (request, response) => {
-  const { stateId } = request.params;
-  const getStateStatsQuery = `
+app.get(
+  "/states/:stateId/stats/",
+  authenticateToken,
+  async (request, response) => {
+    const { stateId } = request.params;
+    const getStateStatsQuery = `
     SELECT 
     SUM(cases),
     SUM(cured),
@@ -191,17 +194,18 @@ app.get("/states/:stateId/stats/", async (request, response) => {
     FROM  district
     WHERE state_id=${stateId};`;
 
-  const stats = await db.get(getStateStatsQuery);
+    const stats = await db.get(getStateStatsQuery);
 
-  console.log(stats);
+    console.log(stats);
 
-  response.send({
-    totalCases: stats["SUM(cases)"],
-    totalCured: stats["SUM(cured)"],
-    totalActive: stats["SUM(active)"],
-    totalDeaths: stats["SUM(deaths)"],
-  });
-});
+    response.send({
+      totalCases: stats["SUM(cases)"],
+      totalCured: stats["SUM(cured)"],
+      totalActive: stats["SUM(active)"],
+      totalDeaths: stats["SUM(deaths)"],
+    });
+  }
+);
 
 app.get(
   "/districts/:districtId/details/",
